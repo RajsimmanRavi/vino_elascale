@@ -24,7 +24,7 @@ This will create a screen session and run the controller. Please make sure the f
 
 Get the instalation script:
 
-```https://raw.githubusercontent.com/RajsimmanRavi/vino_elascale/master/overlay-elascale-init```
+```wget https://raw.githubusercontent.com/RajsimmanRavi/vino_elascale/master/overlay-elascale-init```
 
 Give execution privilege for the script: ```chmod 755 overlay-elascale-init```
 

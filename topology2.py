@@ -18,15 +18,15 @@ topology['switch number'] = [ ( 'host number' , 'internal port addr' , 'bridge_n
 contr_addr = '10.2.1.23:6633'
 
 switches = {}
-switches["sw1"] = {'contr_addr': contr_addr, 'region': 'EDGE-TR-1', 'flavor': 'm1.small', 'bridge_name': 'sw1_br', 'int_ip': ('p1', '192.168.200.18')}
-switches["sw2"] = {'contr_addr': contr_addr, 'region': 'EDGE-TR-1', 'flavor': 'm1.small'}
-switches["sw3"] = {'contr_addr': contr_addr, 'region': 'EDGE-TR-1', 'flavor': 'm1.small', 'bridge_name': 'sw3_br'}
+switches["sw1"] = {'contr_addr': contr_addr, 'region': 'CORE', 'flavor': 'm1.small', 'bridge_name': 'sw1_br', 'int_ip': ('p1', '192.168.200.18')}
+switches["sw2"] = {'contr_addr': contr_addr, 'region': 'CORE', 'flavor': 'm1.small'}
+switches["sw3"] = {'contr_addr': contr_addr, 'region': 'CORE', 'flavor': 'm1.small', 'bridge_name': 'sw3_br'}
 
 hosts = {}
-hosts["h1"] = {'region': 'EDGE-TR-1', 'flavor': 'm1.medium'}
-hosts["h2"] = {'region': 'EDGE-TR-1', 'flavor': 'm1.medium'}
-hosts["h3"] = {'region': 'EDGE-TR-1', 'flavor': 'm1.medium'}
-hosts["h4"] = {'region': 'EDGE-TR-1', 'flavor': 'm1.medium'}
+hosts["h1"] = {'region': 'CORE', 'flavor': 'm1.medium'}
+hosts["h2"] = {'region': 'CORE', 'flavor': 'm1.medium'}
+hosts["h3"] = {'region': 'CORE', 'flavor': 'm1.medium'}
+hosts["h4"] = {'region': 'CORE', 'flavor': 'm1.medium'}
 
 # Do not connect two Vxlans to the same switch pairings while running a simple switch controller
 topology = {}
