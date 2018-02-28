@@ -201,9 +201,8 @@ def config_hosts_elascale():
     print("Closing SSH connection for Swarm Master")
 
     master_ssh.close()
-"""
+
 if __name__=="__main__":
-    main()
-"""
+    config_hosts_elascale()
 
 

@@ -216,7 +216,8 @@ def setup_switches(hosts_dict, switches_dict):
     for sw_name, sw_dict in switches_dict.items():
         sw_prop_map = topology.switches[sw_name] #The properties of the switch
         sw_topo_map = topology.topology[sw_name] #The list of interconnections
-        print "setting up {}".format(sw_name)
+        #print "setting up {}".format(sw_name)
+        print("*** SETUP SWITCH: %s ***" %sw_name)
 
         #ssh to VM
         ssh = paramiko.SSHClient()
@@ -231,6 +232,7 @@ def setup_switches(hosts_dict, switches_dict):
         bridge_name = sw_prop_map['bridge_name'] if 'bridge_name' in sw_prop_map else 'br1'
 
         command = "sudo ovs-vsctl add-br %s" % bridge_name
+        print("## OVS-COMMAND: %s" %command)
         execute_and_verify(ssh, command, "ovs", bridge_name)
 
         #Attach controller
@@ -239,12 +241,15 @@ def setup_switches(hosts_dict, switches_dict):
         if contr_addr :
 
             command = "sudo ovs-vsctl set-controller %s tcp:%s" % (bridge_name, contr_addr)
+            print("## OVS-COMMAND: %s" %command)
             execute_and_verify(ssh, command, "ovs", contr_addr)
 
             command = "sudo ovs-vsctl set-fail-mode %s secure" % bridge_name
+            print("## OVS-COMMAND: %s" %command)
             execute_and_verify(ssh, command, "ovs", bridge_name)
 
             command = "sudo ovs-vsctl set controller %s connection-mode=out-of-band" % bridge_name
+            print("## OVS-COMMAND: %s" %command)
             execute_and_verify(ssh, command, "ovs", bridge_name)
 
 
@@ -252,12 +257,15 @@ def setup_switches(hosts_dict, switches_dict):
             int_port, int_ip = sw_prop_map["int_ip"]
 
             command = "sudo ovs-vsctl add-port %s %s -- set interface %s type=internal" % (bridge_name, int_port, int_port)
+            print("## OVS-COMMAND: %s" %command)
             execute_and_verify(ssh, command, "ovs", int_port)
 
             command =  "mac=`sudo ovs-vsctl get interface %s mac_in_use`;sudo ovs-vsctl set interface %s mac=\"$mac\"" % (int_port, int_port)
+            print("## OVS-COMMAND: %s" %command)
             execute_and_verify(ssh, command, "ovs", int_port)
 
             command = "sudo ifconfig %s %s/24 up" %(int_port, int_ip)
+            print("## IFCONFIG: %s" %command)
             execute_and_verify(ssh, command, "ifconfig", int_ip)
 
         node_ip = ''# the internal ip for use in the vxlan set up
@@ -274,13 +282,17 @@ def setup_switches(hosts_dict, switches_dict):
                 vni = _get_vni(node, sw_name)
                 node_ip = switches_dict[node]["ip_addr"]
 
-            command = "sudo ovs-vsctl add-port %s vxlan%s -- set interface vxlan%s type=vxlan options:remote_ip=%s options:key=%s" % (bridge_name, vni, vni, node_ip, vni)
+            command = "sudo ovs-vsctl add-port %s vxlan%s -- set interface vxlan%s type=vxlan options:remote_ip=%s options:key=%s  options:dst_port=8479" % (bridge_name, vni, vni, node_ip, vni)
+            print("## OVS-COMMAND: %s" %command)
             execute_and_verify(ssh, command, "ovs", str(vni))
+        print("*** FINISHED SETTING UP SWITCH: %s ***" %sw_name)
         ssh.close()
 
 def setup_hosts(hosts_dict, switches_dict):
     for host_name, host_dict in hosts_dict.items():
-        print "setting up {}".format(host_name)
+        #print "setting up {}".format(host_name)
+        print("*** SETUP HOST: %s ***" %host_name)
+
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(host_dict["ip_addr"], username=host_dict["user_name"], key_filename=config.private_key_file)
@@ -299,17 +311,21 @@ def setup_hosts(hosts_dict, switches_dict):
 
                     # run the ovs commands
                     command = "sudo ovs-vsctl add-br %s" % bridge_name
+                    print("## OVS-COMMAND: %s" %command)
                     execute_and_verify(ssh, command, "ovs", bridge_name)
 
                     command = "sudo ovs-vsctl add-port %s p%s -- set interface p%s type=internal" % (bridge_name,count, count)
+                    print("## OVS-COMMAND: %s" %command)
                     keyword_search = "p%s" % count
                     execute_and_verify(ssh, command, "ovs", keyword_search)
 
                     command =  "mac=`sudo ovs-vsctl get interface p%s mac_in_use`;sudo ovs-vsctl set interface p%s mac=\"$mac\"" % (count, count)
+                    print("## OVS-COMMAND: %s" %command)
                     keyword_search = "p%s" % count
                     execute_and_verify(ssh, command, "ovs", keyword_search)
 
                     command = "sudo ifconfig p%s %s/24 up" %(count, vxlan_ip)
+                    print("## IFCONFIG: %s" %command)
                     execute_and_verify(ssh, command, "ifconfig", str(vxlan_ip))
 
                     #get switch ip addr
@@ -317,10 +333,11 @@ def setup_hosts(hosts_dict, switches_dict):
 
                     vni = _get_vni(sw_name, host_name)
 
-
-                    command = "sudo ovs-vsctl add-port %s vxlan%s -- set interface vxlan%s type=vxlan options:remote_ip=%s options:key=%s" % (bridge_name,vni,vni,switch_ip, vni)
+                    command = "sudo ovs-vsctl add-port %s vxlan%s -- set interface vxlan%s type=vxlan options:remote_ip=%s options:key=%s options:dst_port=8479" % (bridge_name,vni,vni,switch_ip, vni)
+                    print("## OVS-COMMAND: %s" %command)
                     execute_and_verify(ssh, command, "ovs", str(vni))
                     count += 1
+        print("*** FINISHED SETTING UP HOST: %s ***" %host_name)
         ssh.close()
 
 #Delete VMs that match instance prefix
@@ -407,6 +424,5 @@ if __name__ == "__main__":
     setup_switches(hosts, switches)
 
     #config_hosts_elascale() # Configure hosts for Elascale
-
     setup_hosts(hosts, switches)
     pretty_print(nodes)  #Pretty table
