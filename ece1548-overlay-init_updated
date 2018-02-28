@@ -89,25 +89,25 @@ if [[ -z "$DOCKER_VXLAN_RULE" ]]; then
 fi
 
 # Adding secgroup rules for Elascale 
-command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 2376 2377 10.0.0.0/0"
+command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 2376 2377 0.0.0.0/0"
 if [[ -z "$DOCKER_DAEMON_RULE" ]]; then
-    nova secgroup-add-rule $SECGROUP_NAME TCP 2376 2377 10.0.0.0/0
+    nova secgroup-add-rule $SECGROUP_NAME TCP 2376 2377 0.0.0.0/0
 fi
-command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 9200 9200 10.0.0.0/0"
+command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 9200 9200 0.0.0.0/0"
 if [[ -z "$ELASTICSEARCH_RULE" ]]; then
-    nova secgroup-add-rule $SECGROUP_NAME TCP 9200 9200 10.0.0.0/0
+    nova secgroup-add-rule $SECGROUP_NAME TCP 9200 9200 0.0.0.0/0
 fi
-command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 5601 6633 0.0.0.0/0"
+command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 5601 5601 0.0.0.0/0"
 if [[ -z "$KIBANA_RULE" ]]; then
-    nova secgroup-add-rule $SECGROUP_NAME TCP 5601 5601 10.0.0.0/0
+    nova secgroup-add-rule $SECGROUP_NAME TCP 5601 5601 0.0.0.0/0
 fi
-command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 8888 8888 10.0.0.0/0"
+command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 8888 8888 0.0.0.0/0"
 if [[ -z "$ELASCALE_UI_RULE" ]]; then
-    nova secgroup-add-rule $SECGROUP_NAME TCP 8888 8888 10.0.0.0/0
+    nova secgroup-add-rule $SECGROUP_NAME TCP 8888 8888 0.0.0.0/0
 fi
-command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 443 443 10.0.0.0/0"
+command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 443 443 0.0.0.0/0"
 if [[ -z "$HTTPS_RULE" ]]; then
-    nova secgroup-add-rule $SECGROUP_NAME TCP 443 443 10.0.0.0/0
+    nova secgroup-add-rule $SECGROUP_NAME TCP 443 443 0.0.0.0/0
 fi
 
 green_desc_title "5. Creating ViNO files related to this lab ..."
