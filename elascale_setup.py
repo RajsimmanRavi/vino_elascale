@@ -13,10 +13,14 @@ def execute_and_verify(shell, command, verify_command, keyword_search):
     ssh = shell
     while True:
         try:
-            stdin, stdout, stderr = ssh.exec_command(command, timeout=25)
+            stdin, stdout, stderr = ssh.exec_command(command, timeout=25, get_pty=True)
             # If command is docker-machine create, print
             if "docker-machine create" in command:
-                print(stdout.read())
+
+                for line in iter(stdout.readline, ""):
+                    line = line.replace("\n","")
+                    print(line)
+
                 print(stderr.read())
 
             stdin, stdout, stderr = ssh.exec_command(verify_command,timeout=25)
@@ -29,8 +33,10 @@ def execute_and_verify(shell, command, verify_command, keyword_search):
             if keyword_search in output:
                 # join --token command spits error (which is good), but may startle user, hence, don't print
                 # Don't print 'docker node inspect' output (too long)
-                if "Error" not in output or "docker node inspect" in verify_command:
-                    print output
+                if "Error" not in output:
+                    if "docker node inspect" not in verify_command:
+                        print output
+
                 print "successfully executed (above) command"
                 break
             else:
