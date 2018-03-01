@@ -5,6 +5,8 @@ This platform utilizes these specific VM images:
 *  Ubuntu-16-04-OVS-DOCKER   - For switches and Hosts
 *  Ubuntu-16-04-RYU          - RYU OpenFlow Controller 
 
+**Note:** Make sure you are logged into SAVI on client1/client2 ```(source savi ...)```
+
 ## Steps for deployment in SAVI Infrastructure ##
 The following procedure describes how to setup Elascale on ViNO platform
 
