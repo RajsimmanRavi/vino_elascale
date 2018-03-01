@@ -80,6 +80,8 @@ def init_swarm_master(ssh, hostname):
     keyword_search = "master"
     execute_and_verify(ssh, command, verify_command, keyword_search)
 
+    print("Successfully labeled Master node")
+
     command = "sudo docker swarm join-token worker | grep -v 'add' | tr -d '\' 2> /dev/null"
     verify_command = command
     keyword_search = "--token"
@@ -128,6 +130,7 @@ def bring_swarm_hosts_up(nova, downed_hosts):
         time.sleep(3)
 
 def get_downed_swarm_hosts(master_ssh):
+    print("Checking for any down nodes...")
     downed_hosts = []
     # check for any down nodes
     command = "sudo docker node ls | grep 'Down\|STATUS'"
@@ -137,6 +140,7 @@ def get_downed_swarm_hosts(master_ssh):
     # Split it into multiple lines
     output = output.split("\n")
     for line in output:
+        print(line)
         if "Down" in line:
             downed_hosts.append(line.split()[1])
 

@@ -37,13 +37,16 @@ The script does the following:
 * Modifies configuration script (config2.py) to add your SAVI authentication and environment information 
 * Modifies topology file (topology2.py) to add the current region 
 
-Execute the ViNO script: ```./vino```
+### Change CONTROLLER Address ###
+Modify ```contr_addr``` variable in topology2.py to the OpenFlow controller VM's IP address (Port 6633 can stay the same)
+
+Execute the ViNO script on the specified folder: ```${SCRIPTS_DIR}/./vino``` (fill in the variable)
 
 The script does the following (in a nutshell):
 * Boots up all the VMs (as defined by your topology)
 * Sets up all the VXLAN interfaces for communication with OVS
 
-Execute the ViNO script: ```./elascale_setup.py```
+Execute the ViNO script on the specified folder: ```${SCRIPTS_DIR}/./elascale_setup.py``` (fill in the variable)
 
 The script does the following (in a nutshell):
 * Sets up the Docker Swarm master (as defined by your topology)
@@ -52,10 +55,10 @@ The script does the following (in a nutshell):
 * Adds all the hosts as docker-machine clients
 
 ## Deploy Elascale Platform
-Once the setup is complete, you can login to your swarm-master, and follow along the 'Execute Installation Script' instructions described in: https://github.com/RajsimmanRavi/Elascale_secure to deploy Elascale on ViNO.  
+Once the setup is complete, you can login to your swarm-master, and follow along the 'Execute Installation Script' and 'Elascale Deployment' instructions described in: https://github.com/RajsimmanRavi/Elascale_secure to deploy Elascale on ViNO platform.  
 
 ## Cleanup Script
-In order to delete all the created VMs, you can simply call the following script: ```./vino_cleanup```
+In order to delete all the created VMs, you can simply call the following script: ```${SCRIPTS_DIR}/./vino_cleanup``` (fill in the variable)
 
 ## Contact
 
