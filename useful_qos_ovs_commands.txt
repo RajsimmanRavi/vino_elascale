@@ -16,6 +16,7 @@ sudo ovs-vsctl --all destroy qos
 sudo ovs-vsctl --all destroy queue
 sudo ovs-vsctl set interface pair_h1_1 ingress_policing_rate=500
 sudo ovs-vsctl set interface pair_h1_1 ingress_policing_burst=50
+sudo ovs-vsctl set-manager ptcp:6632
 sudo ovs-vsctl set Bridge sw1_br protocols=OpenFlow13
 
 # Some useful OVS commands
