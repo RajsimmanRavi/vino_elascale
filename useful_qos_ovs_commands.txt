@@ -1,0 +1,40 @@
+# Some Usefule tc commands
+sudo tc qdisc show
+sudo tc qdisc show dev pair_h1_1
+sudo tc class show
+sudo tc class show dev pair_h2_1
+sudo tc filter show 
+sudo tc qdisc del dev pair_h1_1 root
+
+# Some Useful OVS-QoS commands
+sudo ovs-vsctl list qos
+sudo ovs-vsctl list queue
+sudo ovs-vsctl list Port pair_h2_1
+sudo ovs-vsctl list interface pair_h1_1
+sudo ovs-vsctl clear Port pair_h2_1 qos
+sudo ovs-vsctl --all destroy qos
+sudo ovs-vsctl --all destroy queue
+sudo ovs-vsctl set interface pair_h1_1 ingress_policing_rate=500
+sudo ovs-vsctl set interface pair_h1_1 ingress_policing_burst=50
+sudo ovs-vsctl set Bridge sw1_br protocols=OpenFlow13
+
+# Some useful OVS commands
+sudo ovs-ofctl -O OpenFlow13 show sw1_br
+sudo ovs-ofctl -O OpenFlow13 dump-flows sw1_br
+sudo ovs-ofctl -O OpenFlow13 del-flows sw1_br tcp,nw_dst=192.168.200.13,tp_dst=5201
+
+# Command to add Switch OVS-DB to RYU controller
+curl -X PUT -d '"tcp:10.2.13.9:6632"' http://10.2.1.23:8090/v1.0/conf/switches/000046e914415240/ovsdb_addr
+
+# Command to add queue to certain port 
+curl -X POST -d '{"port_name": "pair_h2_1", "type": "linux-htb", "max_rate": "10000000", "queues": [{"max_rate": "7000000", "min_rate": "1000000"}]}' http://10.2.1.23:8090/qos/queue/000046e914415240
+
+# Command to add filter to queue 
+curl -X POST -d '{"priority": 2, "match": {"nw_dst": "192.168.200.13", "nw_proto": "TCP", "tp_dst": "5201"}, "actions":{"queue": "0"}}' http://10.2.1.23:8090/qos/rules/000046e914415240
+
+# Command to add filter to queue using ovs-ofctl 
+sudo ovs-ofctl -O OpenFlow13 add-flow sw1_br priority=2,tcp,nw_dst=192.168.200.13,tp_dst=5201,actions=set_queue:0,goto_table:1
+
+# You need to add the paths to table=1 manually, so the filters work. If not, it gets stuck
+sudo ovs-ofctl -O OpenFlow13 add-flow sw1_br table=1,priority=1,in_port=6,dl_src=3e:47:6d:b0:7d:ef,dl_dst=fe:cc:6a:1b:02:45,actions=output:5
+sudo ovs-ofctl -O OpenFlow13 add-flow sw1_br table=1,priority=1,in_port=5,dl_src=fe:cc:6a:1b:02:45,dl_dst=3e:47:6d:b0:7d:ef,actions=output:6
