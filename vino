@@ -235,6 +235,10 @@ def setup_switches(hosts_dict, switches_dict):
         print("## OVS-COMMAND: %s" %command)
         execute_and_verify(ssh, command, "ovs", bridge_name)
 
+        command = "sudo ovs-vsctl set Bridge %s rotocols=OpenFlow13" % bridge_name
+        print("## OVS-COMMAND: %s" %command)
+        execute_and_verify(ssh, command, "ovs", bridge_name)
+
         #Attach controller
         #Default for a OVS switch, is standalone mode
         contr_addr = sw_prop_map.get('contr_addr', topology.contr_addr)
@@ -276,16 +280,17 @@ def setup_switches(hosts_dict, switches_dict):
         vni = 0 #The VNI- only VMs on the VNI can communicate
 
         #The iterate over nodes connected to this switch
+
+        # Add counter to properly add for switch bridges
+        counter = 1
         for node in sw_topo_map:
-            # Add counter to properly add for switch bridges
-            counter = 1
 
             # Create a new ovs bridge to handle vxlan
-            br_name = bridge_name+counter
+            br_name = bridge_name+str(counter)
 
             # Create veth pair interfaces
-            veth_pair_1 = "pair_h"+counter+"_1"
-            veth_pair_2 = "pair_h"+counter+"_2"
+            veth_pair_1 = "pair_h"+str(counter)+"_1"
+            veth_pair_2 = "pair_h"+str(counter)+"_2"
 
             command = "sudo ip link add "+veth_pair_1+" type veth peer name "+veth_pair_2
             print("## IFCONFIG: %s" %command)
