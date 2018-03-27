@@ -19,7 +19,7 @@ contr_addr = '10.2.1.23:6633'
 
 switches = {}
 switches["sw1"] = {'contr_addr': contr_addr, 'region': 'CORE', 'flavor': 'm1.small', 'bridge_name': 'sw1_br', 'int_ip': ('p1', '192.168.200.18')}
-switches["sw2"] = {'contr_addr': contr_addr, 'region': 'CORE', 'flavor': 'm1.small'}
+switches["sw2"] = {'contr_addr': contr_addr, 'region': 'CORE', 'flavor': 'm1.small', 'bridge_name': 'sw2_br'}
 switches["sw3"] = {'contr_addr': contr_addr, 'region': 'CORE', 'flavor': 'm1.small', 'bridge_name': 'sw3_br'}
 
 hosts = {}
