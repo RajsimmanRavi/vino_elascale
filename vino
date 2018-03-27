@@ -185,7 +185,7 @@ def execute_and_verify(shell, command, verify_command, keyword_search):
             time.sleep(1)
 
             if verify_command == "ovs" or verify_command == "ifconfig":
-                verify = "sudo ovs-vsctl show && sudo ifconfig"
+                verify = "sudo ovs-vsctl show && sudo ifconfig -a"
             else:
                 verify = verify_command
             """
@@ -229,7 +229,7 @@ def setup_switches(hosts_dict, switches_dict):
         add_hostname(ssh)
 
         # run the ovs commands
-        bridge_name = sw_prop_map['bridge_name'] if 'bridge_name' in sw_prop_map else 'br1'
+        bridge_name = sw_prop_map['bridge_name']
 
         command = "sudo ovs-vsctl add-br %s" % bridge_name
         print("## OVS-COMMAND: %s" %command)
@@ -241,6 +241,10 @@ def setup_switches(hosts_dict, switches_dict):
         if contr_addr :
 
             command = "sudo ovs-vsctl set-controller %s tcp:%s" % (bridge_name, contr_addr)
+            print("## OVS-COMMAND: %s" %command)
+            execute_and_verify(ssh, command, "ovs", contr_addr)
+
+            command = "sudo ovs-vsctl set-manager ptcp:6632"
             print("## OVS-COMMAND: %s" %command)
             execute_and_verify(ssh, command, "ovs", contr_addr)
 
@@ -273,6 +277,46 @@ def setup_switches(hosts_dict, switches_dict):
 
         #The iterate over nodes connected to this switch
         for node in sw_topo_map:
+            # Add counter to properly add for switch bridges
+            counter = 1
+
+            # Create a new ovs bridge to handle vxlan
+            br_name = bridge_name+counter
+
+            # Create veth pair interfaces
+            veth_pair_1 = "pair_h"+counter+"_1"
+            veth_pair_2 = "pair_h"+counter+"_2"
+
+            command = "sudo ip link add "+veth_pair_1+" type veth peer name "+veth_pair_2
+            print("## IFCONFIG: %s" %command)
+            # Atleast check if one interface is set up
+            execute_and_verify(ssh, command, "ifconfig", veth_pair_1)
+
+            # Set interfaces up
+            command = "sudo ifconfig %s up" %(veth_pair_1)
+            print("## IFCONFIG: %s" %command)
+            execute_and_verify(ssh, command, "ifconfig", veth_pair_1)
+
+            # Set interfaces up
+            command = "sudo ifconfig %s up" %(veth_pair_2)
+            print("## IFCONFIG: %s" %command)
+            execute_and_verify(ssh, command, "ifconfig", veth_pair_2)
+
+            # Create a new ovs-bridge
+            command = "sudo ovs-vsctl add-br %s" % br_name
+            print("## OVS-COMMAND: %s" %command)
+            execute_and_verify(ssh, command, "ovs", br_name)
+
+            # Add veth_pair_1 to main bridge
+            command = "sudo ovs-vsctl add-port %s %s" % (bridge_name, veth_pair_1)
+            print("## OVS-COMMAND: %s" %command)
+            execute_and_verify(ssh, command, "ovs", veth_pair_1)
+
+            # Add veth_pair_2 to new created bridge
+            command = "sudo ovs-vsctl add-port %s %s" % (br_name, veth_pair_2)
+            print("## OVS-COMMAND: %s" %command)
+            execute_and_verify(ssh, command, "ovs", veth_pair_2)
+
             # handle hosts
             if isinstance(node, tuple):
                 vni = _get_vni(node[0], sw_name)
@@ -282,9 +326,11 @@ def setup_switches(hosts_dict, switches_dict):
                 vni = _get_vni(node, sw_name)
                 node_ip = switches_dict[node]["ip_addr"]
 
-            command = "sudo ovs-vsctl add-port %s vxlan%s -- set interface vxlan%s type=vxlan options:remote_ip=%s options:key=%s  options:dst_port=8479" % (bridge_name, vni, vni, node_ip, vni)
+            command = "sudo ovs-vsctl add-port %s vxlan%s -- set interface vxlan%s type=vxlan options:remote_ip=%s options:key=%s  options:dst_port=8479" % (br_name, vni, vni, node_ip, vni)
             print("## OVS-COMMAND: %s" %command)
             execute_and_verify(ssh, command, "ovs", str(vni))
+            counter = counter + 1
+
         print("*** FINISHED SETTING UP SWITCH: %s ***" %sw_name)
         ssh.close()
 
@@ -325,6 +371,10 @@ def setup_hosts(hosts_dict, switches_dict):
                     execute_and_verify(ssh, command, "ovs", keyword_search)
 
                     command = "sudo ifconfig p%s %s/24 up" %(count, vxlan_ip)
+                    print("## IFCONFIG: %s" %command)
+                    execute_and_verify(ssh, command, "ifconfig", str(vxlan_ip))
+
+                    command = "sudo ifconfig p%s mtu 1300" %(count)
                     print("## IFCONFIG: %s" %command)
                     execute_and_verify(ssh, command, "ifconfig", str(vxlan_ip))
 
