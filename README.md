@@ -19,7 +19,8 @@ This will create a screen session and run the controller. Please make sure the f
 
 | IP Protocol   | From Port  | To Port  |  Description     |
 | ------------- |:----------:|:--------:| ----------------:|
-| udp           |     8479   |    8479  |   VXLAN          |
+| udp           |     8479   |    8479  |   OVS VXLAN      |
+| udp           |     4789   |    4789  |   Docker VXLAN   |
 | tcp           |     6633   |    6633  |   OpenFlow       |
 
 ## Execute Installation Script

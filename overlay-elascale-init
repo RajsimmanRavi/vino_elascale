@@ -59,19 +59,23 @@ else
 fi
 
 
-green_desc_title "4. Adding rules to enable SSH, ICMP, OpenFlow, and VXLAN for both Docker and OVS. Adding ports needed for Elascale platform to ($SECGROUP_NAME) ..."
+green_desc_title "4. Adding rules to enable SSH, ICMP, OpenFlow, and VXLAN for both Docker and OVS. Adding ports needed for Elascale platform and IoT App to ($SECGROUP_NAME) ..."
 SSH_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i tcp | grep 22`
 ICMP_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i icmp | grep 255`
 OF_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i tcp | grep 6633`
 DOCKER_VXLAN_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i udp | grep 4789`
 OVS_VXLAN_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i udp | grep 8479`
 
-# Secgroups for For Elascale
+# Secgroups for Elascale
 DOCKER_DAEMON_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i tcp | grep 2376`
 ELASTICSEARCH_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i tcp | grep 9200`
 KIBANA_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i tcp | grep 5601`
 ELASCALE_UI_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i tcp | grep 8888`
 HTTPS_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i tcp | grep 443`
+
+# Secgroups for IoT App
+REST_API_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i tcp | grep 6969`
+MYSQL_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i tcp | grep 3306`
 
 command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 22 22 0.0.0.0/0"
 if [[ -z "$SSH_RULE" ]]; then
@@ -90,7 +94,7 @@ if [[ -z "$DOCKER_VXLAN_RULE" ]]; then
     nova secgroup-add-rule $SECGROUP_NAME UDP 4789 4789 0.0.0.0/0
 fi
 command_desc "nova secgroup-add-rule $SECGROUP_NAME UDP 8479 8479 0.0.0.0/0"
-if [[ -z "$DOCKER_VXLAN_RULE" ]]; then
+if [[ -z "$OVS_VXLAN_RULE" ]]; then
     nova secgroup-add-rule $SECGROUP_NAME UDP 8479 8479 0.0.0.0/0
 fi
 
@@ -114,6 +118,16 @@ fi
 command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 443 443 0.0.0.0/0"
 if [[ -z "$HTTPS_RULE" ]]; then
     nova secgroup-add-rule $SECGROUP_NAME TCP 443 443 0.0.0.0/0
+fi
+
+# Adding secgroup rules for IoT APP 
+command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 6969 6969 0.0.0.0/0"
+if [[ -z "$REST_API_RULE" ]]; then
+    nova secgroup-add-rule $SECGROUP_NAME TCP 6969 6969 0.0.0.0/0
+fi
+command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 3306 3306 0.0.0.0/0"
+if [[ -z "$MYSQL_RULE" ]]; then
+    nova secgroup-add-rule $SECGROUP_NAME TCP 3306 3306 0.0.0.0/0
 fi
 
 green_desc_title "5. Creating ViNO files related to this lab ..."
