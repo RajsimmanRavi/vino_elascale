@@ -33,6 +33,8 @@ This will create a screen session and run the controller. Please make sure the f
 | udp           |     4789   |    4789  |   Docker VXLAN   |
 | tcp           |     6633   |    6633  |   OpenFlow       |
 
+In order to work with Elascale Autoscaler (for autonomic bandwidth control), you need to copy the switches.py file (in this repo) to /usr/local/lib/python2.7/dist-packages/ryu/topology/ and restart the controller. This allows fetching Switches' IP addresses for topology information (required for autoscaling).
+
 ## Execute Installation Script
 
 Get the instalation script:
