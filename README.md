@@ -15,6 +15,16 @@ In order for ViNO to be setup, you need to have a RYU OpenFlow Controller up and
 
 ```screen -d -m ryu-manager --config-file /etc/ryu/ryu.conf ryu.app.simple_switch```
 
+To run QoS, you need to run the following commands:
+
+```
+tmux -l
+
+cd /usr/local/lib/python2.7/dist-packages/ryu/app
+
+ryu-manager --config-file /etc/ryu/ryu.conf ryu.app.simple_switch_13 ryu.app.ofctl_rest ryu.app.rest_qos ryu.app.rest_topology ryu.app.rest_conf_switch
+```
+
 This will create a screen session and run the controller. Please make sure the following secgroup ports are open for this VM and all other VMs:
 
 | IP Protocol   | From Port  | To Port  |  Description     |
@@ -58,7 +68,7 @@ The script does the following (in a nutshell):
 * Adds all the hosts as docker-machine clients
 
 ## Deploy Elascale Platform
-Once the setup is complete, you can login to your swarm-master, and follow along the 'Execute Installation Script' and 'Elascale Deployment' instructions described in: https://github.com/RajsimmanRavi/Elascale_secure to deploy Elascale on ViNO platform.  
+Once the setup is complete, you can login to your swarm-master, and follow along the 'Execute Installation Script' and 'Elascale Deployment' instructions described in: https://github.com/RajsimmanRavi/Elascale_secure to deploy Elascale on ViNO platform. At the end of the procedure, if you're having this problem with docker-machine nodes: **Unable to query docker version: Cannot connect to the docker engine endpoint**, then just regenerate the certs: `sudo docker-machine regenerate-certs {hostname}`  
 
 ## Cleanup Script
 In order to delete all the created VMs, you can simply call the following script: ```${SCRIPTS_DIR}/./vino_cleanup``` (fill in the variable)
