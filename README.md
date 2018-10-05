@@ -15,14 +15,14 @@ In order for ViNO to be setup, you need to have a RYU OpenFlow Controller up and
 
 ```screen -d -m ryu-manager --config-file /etc/ryu/ryu.conf ryu.app.simple_switch```
 
-To run QoS, you need to run the following commands:
+In order to work with Elascale Autoscaler (for autonomic bandwidth control), you need to copy the switches.py and qos_simple_switch_13.py (in this repo) to /usr/local/lib/python2.7/dist-packages/ryu/topology/ and restart the controller. This allows fetching Switches' IP addresses for topology information (required for autoscaling).
 
 ```
 tmux -l
 
 cd /usr/local/lib/python2.7/dist-packages/ryu/app
 
-ryu-manager --config-file /etc/ryu/ryu.conf ryu.app.simple_switch_13 ryu.app.ofctl_rest ryu.app.rest_qos ryu.app.rest_topology ryu.app.rest_conf_switch
+sudo ryu-manager --config-file /etc/ryu/ryu.conf ryu.app.ofctl_rest ryu.app.rest_topology ryu.app.rest_conf_switch ryu.app.rest_qos ryu.app.qos_simple_switch_13
 ```
 
 This will create a screen session and run the controller. Please make sure the following secgroup ports are open for this VM and all other VMs:
@@ -31,9 +31,9 @@ This will create a screen session and run the controller. Please make sure the f
 | ------------- |:----------:|:--------:| ----------------:|
 | udp           |     8479   |    8479  |   OVS VXLAN      |
 | udp           |     4789   |    4789  |   Docker VXLAN   |
+| tcp           |     6632   |    6632  |   OVSDB          |
 | tcp           |     6633   |    6633  |   OpenFlow       |
 
-In order to work with Elascale Autoscaler (for autonomic bandwidth control), you need to copy the switches.py file (in this repo) to /usr/local/lib/python2.7/dist-packages/ryu/topology/ and restart the controller. This allows fetching Switches' IP addresses for topology information (required for autoscaling).
 
 ## Execute Installation Script
 

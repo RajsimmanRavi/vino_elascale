@@ -63,6 +63,7 @@ green_desc_title "4. Adding rules to enable SSH, ICMP, OpenFlow, and VXLAN for b
 SSH_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i tcp | grep 22`
 ICMP_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i icmp | grep 255`
 OF_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i tcp | grep 6633`
+OVSDB_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i tcp | grep 6632`
 DOCKER_VXLAN_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i udp | grep 4789`
 OVS_VXLAN_RULE=`nova secgroup-list-rules $SECGROUP_NAME | grep -i udp | grep 8479`
 
@@ -84,6 +85,10 @@ fi
 command_desc "nova secgroup-add-rule $SECGROUP_NAME ICMP -1 255 0.0.0.0/0"
 if [[ -z "$ICMP_RULE" ]]; then
     nova secgroup-add-rule $SECGROUP_NAME ICMP -1 255 0.0.0.0/0
+fi
+command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 6632 6632 0.0.0.0/0"
+if [[ -z "$OVSDB_RULE" ]]; then
+    nova secgroup-add-rule $SECGROUP_NAME TCP 6632 6632 0.0.0.0/0
 fi
 command_desc "nova secgroup-add-rule $SECGROUP_NAME TCP 6633 6633 0.0.0.0/0"
 if [[ -z "$OF_RULE" ]]; then
